@@ -1,4 +1,5 @@
 
+
 promise 的参数的是 executor 函数: 执行器 (resolve, reject) => {}
 内部**立即同步调用**,异步操作在执行器中执行
 
@@ -26,4 +27,4 @@ promise 的参数的是 executor 函数: 执行器 (resolve, reject) => {}
   4 异常穿透
   当使用 promise 的 then 链式调用时, 可以在最后指定失败的回调（.catch()）,前面任何操作出了异常, 都会传到最后失败的回调中处理。
   5 中断 promise 链
-  在回调函数中返回一个pendding状态的promise对象
+  在回调函数中返回一个pendding状态的promise对象。
