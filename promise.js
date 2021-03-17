@@ -44,6 +44,12 @@ function MyPromise(executor) {
 MyPromise.prototype.then = function (onResolved, onRejected) {
   // then方法一旦指定，则在执行器执行完后会立即执行
   // then方法中 当Promise已经改变 则直接执行回调 否则暂存回调
+  // 执行 then 方法是同步的，而 then 中的回调是异步的
+
+/*
+为什么说内部是同步任务时 先改变状态再执行then 而异步任务时先执行then再改变状态
+重点是then中的回调函数不一定是在then执行时调用的! 当状态是pending时会暂存回调函！ 
+ */
   if (this.PromiseState === "fulfilled") {
     onResolved(this.PromiseResult);
   }
