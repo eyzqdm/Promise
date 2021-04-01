@@ -59,6 +59,13 @@ new Promise((resolve, reject) => {
   当resolve中传入的是promise 那就相当于resolve异步执行。因为要递归解析promise。
   那就必然会调用then。进而里面的回调会进入队列。导致执行外面大then执行时resolve还未执行完毕 
   promise状态还未改变。因此效果跟执行器传入异步操作一样。
+
+  总之 then同步 回调异步  只是会回调进入队列的位置可能不同
+  上级同步改变状态 则在then中进入队列  异步改变状态 则在resolve中进入队列
+  若上级是then 则一定是在reslve中进入队列。为什么？
+  因为下个then状态取决于上个then的回调返回值。而then的回调一定是异步执行的。
+  也就表明下个then执行时，上个then的回调一定还没执行（因为then是同步的）。
+  因此说 若上级是then 则下级then的回调一定是在reslve中进入队列
   */
 
 /* let p = new Promise((resolve) => {

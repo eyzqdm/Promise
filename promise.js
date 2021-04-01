@@ -82,6 +82,7 @@ resolve 函数
 3 调用成功的回调函数(如果是异步操作)
    */
   const resolve = (data) => {
+    //console.log(this,data)
     // 增加判断如果resolve传入的是promise的判断
     if (data instanceof Promise) {
       // 递归解析直到为普通值为止
@@ -264,6 +265,7 @@ Promise.resolve = function (value) {
     if (value instanceof Promise) {
       value.then(
         (res) => {
+          //console.log('asd')
           resolve(res);
         },
         (err) => {
@@ -326,6 +328,11 @@ Promise.all = function (promises) {
 //添加 race 方法
 Promise.race = function (promises) {
   return new Promise((resolve, reject) => {
+    promises.forEach((i,index,arr) => {
+      if (!(i instanceof Promise)) {
+         arr[index] = Promise.resolve(i)
+      }
+    });
     for (let i = 0; i < promises.length; i++) {
       promises[i].then(
         (v) => {
