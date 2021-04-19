@@ -252,9 +252,9 @@ Promise.prototype.finally = function (onFinished) {
   return this.then((val) => {
     onFinished();
     return val;
-  }).catch((err) => {
+  },(reason) => {
     onFinished();
-    return err;
+    throw reason
   });
 };
 
@@ -328,12 +328,11 @@ Promise.all = function (promises) {
 //添加 race 方法
 Promise.race = function (promises) {
   return new Promise((resolve, reject) => {
-    promises.forEach((i,index,arr) => {
-      if (!(i instanceof Promise)) {
-         arr[index] = Promise.resolve(i)
-      }
-    });
     for (let i = 0; i < promises.length; i++) {
+      // 非Promise先转化为Promise
+      if (!(promises[i] instanceof Promise)) {
+        promises[i] = Promise.resolve(promises[i]);
+      }
       promises[i].then(
         (v) => {
           //谁率先改变状态 返回值就是谁的结果
@@ -356,11 +355,11 @@ any方法可以看作all方法的反例
  */
 Promise.any = function (promises) {
   return new Promise((resolve, reject) => {
-    //声明变量
     let count = 0;
-    //遍历
     for (let i = 0; i < promises.length; i++) {
-      //
+      if (!(promises[i] instanceof Promise)) {
+        promises[i] = Promise.resolve(promises[i]);
+      }
       promises[i].then(
         (res) => {
           resolve(res);
@@ -386,34 +385,40 @@ Promise.any = function (promises) {
     { status: 'fulfilled', value: 42 },
     { status: 'rejected', reason: -1 }
   ]
+
+ 该方法并不严格要求必须是promise 因为其返回结果不受其影响。反观race，any就不行
+ race 谁率先返回 谁就是结果  如果常量不转为promise 则不进入队列 会直接返回结果 不行
+ any也是一个道理 谁变为resolve 谁就是结果 常量不管在什么位置 都一定是先返回结果 。。。 
+ 而  allSettled返回结果个异步返回的顺序无关所以。。
+ 同理 all方法也是 常量不可能reject 因此直接放入结果数组即可 
+ 总之 需不需要转promise就看转不转的结果一不一样就行了
  */
 Promise.allSettled = function (promises) {
   return new Promise((resolve) => {
-    //声明变量
-    let count = 0;
     let result = [];
     //遍历
     for (let i = 0; i < promises.length; i++) {
-      //
-      promises[i].then(
-        (res) => {
-          result[i] = {
-            status: Fulfilled,
-            value: res,
-          };
-          count++;
-          // if(count === promises.length) resolve(result)
-        },
-        (err) => {
-          count++;
-          result[i] = {
-            status: Reject,
-            reason: err,
-          };
-          count++;
-          //  if (count === promises.length) resolve(result)
-        }
-      );
+      if (promises[i] instanceof Promise) {
+        promises[i].then(
+          (res) => {
+            result[i] = {
+              status: Fulfilled,
+              value: res,
+            };
+          },
+          (err) => {
+            result[i] = {
+              status: Reject,
+              reason: err,
+            };
+          }
+        );
+      } else {
+        result[i] = {
+          status: Fulfilled,
+          value: promises[i],
+        };
+      }
     }
     resolve(result);
   });
