@@ -12,15 +12,8 @@ Promise.race([p1, p2, p3]).then((res) => {
   console.log(res);
 });
  */
-const Promise = require('./promiseA+')
 
-
-Promise.resolve().then(() => {
-  console.log('ok1')
-  return new Promise(()=>{})  // 返回“pending”状态的Promise对象
-}).then(() => {
-  // 后续的函数不会被调用
-  console.log('ok2')
-}).catch(err => {
-  console.log('err->', err)
-})
+const res = Promise.resolve(1).then(2);
+setTimeout(() => {
+  console.log(res);
+});

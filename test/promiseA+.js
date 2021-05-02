@@ -119,6 +119,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
     if (this.PromiseState === Fulfilled) {
       setTimeout(() => {
         try {
+          console.log(onResolved)
           let x = onResolved(this.PromiseResult);
 
           resolvePromise(promise2, x, resolve, reject);
